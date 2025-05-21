@@ -1,5 +1,10 @@
 const db = require('../config/db'); // MySQL connection
 const otpStore = require('../utils/otpStore');
+require('dotenv').config();
+const twilio = require('twilio');
+
+
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 exports.sendOtp = async (req, res) => {
   const { mobileNumber } = req.body;
@@ -24,13 +29,20 @@ exports.sendOtp = async (req, res) => {
     // Store OTP in memory with 5 min expiry
     otpStore.set(mobileNumber, {
       otp,
-      expiresAt: Date.now() + 5 * 60 * 1000
+      expiresAt: Date.now() + 5 * 60 * 1000,
     });
 
-    res.json({ message: 'OTP sent successfully', otp }); // return OTP for testing
+    // Send OTP using Twilio
+    await client.messages.create({
+      body: `Your OTP code is ${otp}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: `+91${mobileNumber}`, // assumes Indian phone numbers
+    });
+
+    res.json({ message: 'OTP sent successfully' });
   } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ message: 'Database error', error });
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ message: 'Failed to send OTP', error });
   }
 };
 
