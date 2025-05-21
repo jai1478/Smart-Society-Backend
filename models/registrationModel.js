@@ -9,9 +9,15 @@ const createRegistration = async ({ userName, mobileNumber, emailAddress }) => {
 };
 
 const getAllRegistrations = async () => {
-  const [rows] = await db.execute('SELECT * FROM registrations');
-  return rows;
+  try {
+    const [rows] = await db.execute('SELECT * FROM registrations');
+    return rows;
+  } catch (error) {
+    console.error("Database error in getAllRegistrations:", error);
+    throw error; // let controller send error to client
+  }
 };
+
 
 module.exports = {
   createRegistration,

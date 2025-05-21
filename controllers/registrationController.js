@@ -25,7 +25,8 @@ const getUsers = async (req, res) => {
     const users = await Registration.getAllRegistrations();
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error(" Error in getUsers:", error);
+    res.status(500).json({ message: 'Server error', error: error.message || 'Unknown error' });
   }
 };
 
