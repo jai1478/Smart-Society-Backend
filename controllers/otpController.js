@@ -8,38 +8,32 @@ exports.sendOtp = async (req, res) => {
     return res.status(400).json({ message: 'Mobile number is required' });
   }
 
-
-
   try {
-    db.query({ sql: 'SELECT * FROM registrations WHERE mobileNumber = ?', timeout: 1000 }, [mobileNumber], (err, results) => {
-      if (err) {
-        console.error('Database query error:', err);
-        return res.status(500).json({ message: 'Database error', error: err });
-      }
+    const [results] = await db.execute(
+      'SELECT * FROM registrations WHERE mobileNumber = ?',
+      [mobileNumber]
+    );
 
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Mobile number not registered' });
+    }
 
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'Mobile number not registered' });
-      }
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // Generate OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // Store OTP in memory store
-      otpStore.set(mobileNumber, {
-        otp,
-        expiresAt: Date.now() + 5 * 60 * 1000
-      });
-
-  
-
-      res.json({ message: 'OTP sent successfully' });
+    // Store OTP in memory with 5 min expiry
+    otpStore.set(mobileNumber, {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000
     });
+
+    res.json({ message: 'OTP sent successfully', otp }); // return OTP for testing
   } catch (error) {
-    
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Database error:', error);
+    res.status(500).json({ message: 'Database error', error });
   }
 };
+
 
 
 exports.verifyOtp = (req, res) => {
