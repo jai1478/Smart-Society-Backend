@@ -61,8 +61,6 @@ exports.verifyOtp = async (req, res) => {
     otpStore.delete(mobileNumber);
     return res.status(400).json({ message: 'OTP has expired', success: false });
   }
-
-  // Optional: Update user as verified
   
 
   otpStore.delete(mobileNumber);

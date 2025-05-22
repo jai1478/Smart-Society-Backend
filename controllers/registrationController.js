@@ -30,7 +30,23 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getMobileNumber = async (req, res) => {
+
+  const { mobileNumber } = req.body;
+  if (!mobileNumber) {
+    return res.status(400).json({ message: 'Mobile number is required' });
+  }
+  
+  try {
+    const exists = await Registration.checkMobileNumber(mobileNumber);
+    res.status(200).json({ exists });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 module.exports = {
   registerUser,
   getUsers,
+  getMobileNumber
 };

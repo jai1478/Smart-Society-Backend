@@ -18,8 +18,22 @@ const getAllRegistrations = async () => {
   }
 };
 
+const checkMobileNumber = async (mobileNumber) => {
+  try {
+    const [result] = await db.execute(
+      'SELECT * FROM registrations WHERE mobileNumber = ?',
+      [mobileNumber]
+    );
+    return result.length > 0;
+  } catch (error) {
+    console.error("Database error in checkMobileNumber:", error);
+    throw error;
+  }
+};
+
 
 module.exports = {
   createRegistration,
   getAllRegistrations,
+  checkMobileNumber
 };
