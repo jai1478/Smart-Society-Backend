@@ -48,20 +48,25 @@ exports.sendOtp = async (req, res) => {
 
 
 
-exports.verifyOtp = (req, res) => {
+exports.verifyOtp = async (req, res) => {
   const { mobileNumber, otp } = req.body;
 
   const record = otpStore.get(mobileNumber);
 
   if (!record || record.otp !== otp) {
-    return res.status(400).json({ message: 'Invalid or expired OTP' });
+    return res.status(400).json({ message: 'Invalid or expired OTP', success: false });
   }
 
   if (Date.now() > record.expiresAt) {
     otpStore.delete(mobileNumber);
-    return res.status(400).json({ message: 'OTP has expired' });
+    return res.status(400).json({ message: 'OTP has expired', success: false });
   }
 
+  // Optional: Update user as verified
+  await db.execute('UPDATE registrations SET isVerified = 1 WHERE mobileNumber = ?', [mobileNumber]);
+
   otpStore.delete(mobileNumber);
-  res.json({ message: 'OTP verified successfully' });
+
+  res.json({ message: 'OTP verified successfully', success: true });
 };
+
