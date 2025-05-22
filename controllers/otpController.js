@@ -63,7 +63,7 @@ exports.verifyOtp = async (req, res) => {
   }
 
   // Optional: Update user as verified
-  await db.execute('UPDATE registrations SET isVerified = 1 WHERE mobileNumber = ?', [mobileNumber]);
+  
 
   otpStore.delete(mobileNumber);
 
