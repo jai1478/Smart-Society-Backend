@@ -1,12 +1,12 @@
 const db = require('../config/db'); // Make sure your DB connection is correctly imported
 
 // Create a new user
-const createUser = async ({ userName, firstName, lastName, email, password, secretSalt }) => {
+const createUser = async ({ userName, firstName, lastName,mobileNo, email, password, secretSalt }) => {
   try {
     const [result] = await db.execute(
-      `INSERT INTO users (userName, firstName, lastName, email, password, secretSalt, isActive, createdBy, createdAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [userName, firstName, lastName, email, password, secretSalt, true, 'system'] // Default isActive to true and createdBy to 'system'
+      `INSERT INTO users (userName, firstName, lastName,mobileNo, email, password, secretSalt, isActive, createdBy, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [userName, firstName, lastName,mobileNo, email, password, secretSalt, true, 'system'] // Default isActive to true and createdBy to 'system'
     );
     return result.insertId;
   } catch (error) {
